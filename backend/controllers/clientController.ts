@@ -1,0 +1,81 @@
+// src/controllers/clientController.ts
+import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+// CREATE: Register a new client
+export const registerClient = async (req: Request, res: Response) => {
+  const { name, age, gender } = req.body;
+  try {
+    const client = await prisma.client.create({
+      data: { name, age, gender },
+    });
+    res.status(201).json(client);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to register client' });
+  }
+};
+
+// READ: Get all clients
+export const getClients = async (req: Request, res: Response) => {
+  try {
+    const clients = await prisma.client.findMany({
+      include: { programs: true },
+    });
+    res.json(clients);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch clients' });
+  }
+};
+
+// READ: Get one client by ID
+export const getClientById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const client = await prisma.client.findUnique({
+      where: { id: parseInt(id) },
+      include: { programs: true },
+    });
+
+    if (!client) {
+      res.status(404).json({ message: 'Client not found' });
+      return;
+    }
+
+    res.json(client);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch client' });
+  }
+};
+
+
+  
+
+// UPDATE: Edit a client
+export const editClient = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, age, gender } = req.body;
+  try {
+    const client = await prisma.client.update({
+      where: { id: parseInt(id) },
+      data: { name, age, gender },
+    });
+    res.json(client);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update client' });
+  }
+};
+
+// DELETE: Remove a client
+export const deleteClient = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await prisma.client.delete({
+      where: { id: parseInt(id) },
+    });
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete client' });
+  }
+};
