@@ -1,19 +1,23 @@
 // src/controllers/programController.ts
-import { Request, RequestHandler, Response } from 'express';
+import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 // CREATE: Create a new program
 export const createProgram = async (req: Request, res: Response) => {
-  const { name } = req.body;
+  const { name, clientIds } = req.body; // Assuming name is the field in your schema
   try {
     const program = await prisma.program.create({
-      data: { name },
+      data: {
+        name, // Use name instead of title
+        clients: clientIds ? { connect: clientIds.map((id: number) => ({ id })) } : undefined,
+      },
     });
     res.status(201).json(program);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create program' });
+    console.error('Error creating program:', err);
+    res.status(500).json({ message: 'Failed to create program', error: err instanceof Error ? err.message : String(err) });
   }
 };
 
@@ -28,45 +32,38 @@ export const getPrograms = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Failed to fetch programs' });
   }
 };
-
 // READ: Get one program by ID
-export const getProgramById = async (req: Request,res: Response,) => {
-  const { id } = req.params;
-
-  // Optional: Add ID validation
-  if (!/^\d+$/.test(id)) {
-    res.status(400).json({ message: 'Invalid ID format' });
-    return;
-  }
-
-  try {
-    const program = await prisma.program.findUnique({
-      where: { id: parseInt(id) },
-      include: { clients: true },
-    });
-
-    if (!program) {
-      res.status(404).json({ message: 'Program not found' });
-      return;
-    }
-
-    res.json(program);
-  } catch (err) {
-    console.error('Database error:', err);
-    res.status(500).json({ message: 'Failed to fetch program' });
-  }
-};
-
-
+export const getProgramById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const program = await prisma.program.findUnique({
+        where: { id: parseInt(id) },
+        include: { clients: true }, // Includes the associated clients
+      });
   
+      if (!program) {
+        res.status(404).json({ message: 'Program not found' });
+        return;
+      }
+  
+      res.json(program);
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch program' });
+    }
+  };
+  
+
 // UPDATE: Edit a program
 export const editProgram = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const { name, clientIds } = req.body; // Update using the correct field name 'name'
   try {
     const program = await prisma.program.update({
       where: { id: parseInt(id) },
-      data: { name },
+      data: {
+        name, // Use name here as well
+        clients: clientIds ? { connect: clientIds.map((id: number) => ({ id })) } : undefined,
+      },
     });
     res.json(program);
   } catch (err) {

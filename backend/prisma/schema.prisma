@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  
 }
 
 datasource db {
@@ -20,22 +20,24 @@ model Doctor {
   name     String
   email    String   @unique
   password String
-  clients  Client[] @relation("DoctorClients")
-  programs Program[] @relation("DoctorPrograms")
+  clients  Client[] @relation("DoctorClients")   // Relation to Client
+  programs Program[] @relation("DoctorPrograms") // Relation to Program
 }
 
 model Client {
-  id        Int     @id @default(autoincrement())
-  name      String
-  email     String  @unique
-  doctorId  Int
-  doctor    Doctor  @relation("DoctorClients", fields: [doctorId], references: [id])
+  id       Int       @id @default(autoincrement())
+  name     String
+  age      Int
+  gender   String
+  programs Program[] @relation("ProgramClients") // Relation to Program
+  doctors  Doctor[]  @relation("DoctorClients")   // Add opposite relation to Doctor
 }
 
 model Program {
-  id        Int     @id @default(autoincrement())
-  title     String
-  doctorId  Int
-  doctor    Doctor  @relation("DoctorPrograms", fields: [doctorId], references: [id])
+  id       Int       @id @default(autoincrement())
+  name     String
+  clients  Client[]  @relation("ProgramClients") // Relation to Client
+  doctors  Doctor[]  @relation("DoctorPrograms") // Add opposite relation to Doctor
 }
+
 

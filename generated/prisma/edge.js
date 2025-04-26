@@ -136,7 +136,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\user\\Desktop\\HealthTrack\\backend\\generated\\prisma",
+      "value": "C:\\Users\\user\\Desktop\\HealthTrack\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -150,12 +150,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\user\\Desktop\\HealthTrack\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\user\\Desktop\\HealthTrack\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.6.0",
@@ -164,11 +163,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://postgres:Post@gres@localhost:5432/healthTrack?schema=public"
+        "value": null
       }
     }
   },
