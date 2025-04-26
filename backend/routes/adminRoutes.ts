@@ -5,9 +5,14 @@ import {
   getPendingDoctorRequests,
   approveDoctorRequest,
   rejectDoctorRequest,
+  loginAdmin,
+  registerAdmin,
 } from '../controllers/adminController';
 
 const router = express.Router();
+// Admin registration and login routes
+router.post('/register', registerAdmin);
+router.post('/login', loginAdmin);
 
 // Public route for doctors to submit registration requests
 router.post('/doctor-requests', asyncHandler(createDoctorRequest));

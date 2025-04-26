@@ -6,6 +6,7 @@ import ClientsPage from './pages/ClientsPage';
 import ProgramsPage from './pages/ProgramsPage';
 import DoctorRegistrationPage from './pages/DoctorRegistrationPage';
 import Header from './components/Header';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/clients" element={<ClientsPage />} />
         <Route path="/programs" element={<ProgramsPage />} />
+        <Route path="/admin" element={<AdminPage />} />
 
         <Route path="/homepage" element={<HomePage/>} />     
          </Routes>

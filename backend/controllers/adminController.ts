@@ -1,7 +1,79 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import asyncHandler from '../middleware/asyncHandler';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
+
+const JWT_SECRET = process.env.JWT_SECRET || "1234";
+
+const generateToken = (id: number) => {
+  return jwt.sign({ id }, JWT_SECRET, {
+    expiresIn: '30d',
+  });
+};
+
+
+export const registerAdmin = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    res.status(400);
+    throw new Error('Please provide name, email and password');
+  }
+
+  const adminExists = await prisma.admin.findUnique({ where: { email } });
+
+  if (adminExists) {
+    res.status(400);
+    throw new Error('Admin already exists');
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  const admin = await prisma.admin.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+      role: 'admin',
+    },
+  });
+
+  if (admin) {
+    res.status(201).json({
+      id: admin.id,
+      name: admin.name,
+      email: admin.email,
+      token: generateToken(admin.id),
+    });
+  } else {
+    res.status(400);
+    throw new Error('Invalid admin data');
+  }
+});
+
+
+export const loginAdmin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const admin = await prisma.admin.findUnique({ where: { email } });
+
+  if (admin && (await bcrypt.compare(password, admin.password))) {
+    res.json({
+      id: admin.id,
+      name: admin.name,
+      email: admin.email,
+      token: generateToken(admin.id),
+    });
+  } else {
+    res.status(401);
+    throw new Error('Invalid email or password');
+  }
+});
+
 
 export const createDoctorRequest = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -45,11 +117,13 @@ export const approveDoctorRequest = async (req: Request, res: Response) => {
     if (request.status !== 'PENDING') {
       return res.status(400).json({ message: 'Request already processed' });
     }
+    const hashedPassword = await bcrypt.hash(request.password, 10);
+
     const doctor = await prisma.doctor.create({
       data: {
         name: request.name,
         email: request.email,
-        password: request.password, // Ideally hash password before saving
+        password: hashedPassword,
       },
     });
     await prisma.doctorRequest.update({

@@ -1,4 +1,4 @@
-// src/routes/programRoutes.ts
+//routes/programRoutes.ts
 import express from 'express';
 import { createProgram,getPrograms,editProgram,deleteProgram, getProgramById } from '../controllers/programController';
 import { authenticateDoctor } from '../middleware/authMiddleware';

@@ -1,4 +1,4 @@
-// src/controllers/clientController.ts
+//controllers/clientController.ts
 import { NextFunction, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
@@ -6,15 +6,14 @@ const prisma = new PrismaClient();
 
 // CREATE: Register a new client
 export const registerClient = async (req: Request, res: Response) => {
-  const { name, age, gender, programIds } = req.body; // programIds is an optional array of IDs for the programs the client should be linked to
+  const { name, age, gender, programIds } = req.body; 
   try {
     const client = await prisma.client.create({
       data: {
         name,
         age,
         gender,
-        programs: programIds ? { connect: programIds.map((id: number) => ({ id })) } : undefined, // Connect client to programs if provided
-      },
+        programs: programIds ? { connect: programIds.map((id: number) => ({ id })) } : undefined, },
     });
     res.status(201).json(client);
   } catch (err) {
@@ -27,7 +26,7 @@ export const registerClient = async (req: Request, res: Response) => {
 export const getClients = async (req: Request, res: Response) => {
   try {
     const clients = await prisma.client.findMany({
-      include: { programs: true }, // Includes the associated programs
+      include: { programs: true }, 
     });
     res.json(clients);
   } catch (err) {
@@ -41,7 +40,7 @@ export const getClientById = async (req: Request, res: Response) => {
   try {
     const client = await prisma.client.findUnique({
       where: { id: parseInt(id) },
-      include: { programs: true }, // Includes the associated programs
+      include: { programs: true }, 
     });
 
     if (!client) {
@@ -58,7 +57,7 @@ export const getClientById = async (req: Request, res: Response) => {
 // UPDATE: Edit a client
 export const editClient = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, age, gender, programIds } = req.body; // Allow updating the associated programs
+  const { name, age, gender, programIds } = req.body; 
   try {
     const client = await prisma.client.update({
       where: { id: parseInt(id) },
@@ -66,7 +65,7 @@ export const editClient = async (req: Request, res: Response) => {
         name,
         age,
         gender,
-        programs: programIds ? { connect: programIds.map((id: number) => ({ id })) } : undefined, // Connect client to programs if provided
+        programs: programIds ? { connect: programIds.map((id: number) => ({ id })) } : undefined, 
       },
     });
     res.json(client);

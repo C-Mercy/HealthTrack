@@ -10,17 +10,37 @@ const LoginPage = () => {
   const [loginDoctor, { isLoading }] = useLoginDoctorMutation();
   const [loginError, setLoginError] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
     setLoginError(null);
     try {
-      const user = await loginDoctor(values).unwrap();
+      let user;
+      if (isAdmin) {
+        // Admin login
+        const response = await fetch('http://localhost:5000/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values),
+        });
+        if (!response.ok) {
+          throw new Error('Login failed');
+        }
+        user = await response.json();
+      } else {
+        // Doctor login
+        user = await loginDoctor(values).unwrap();
+      }
       if (user && user.token) {
         localStorage.setItem('token', user.token);
+        if (isAdmin) {
+          navigate('/admin');
+        } else {
+          navigate('/home');
+        }
       }
-      navigate('/home');
     } catch (err) {
       setLoginError('Login failed. Please check your credentials.');
     }
@@ -56,7 +76,7 @@ const LoginPage = () => {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-      <Card title="Doctor Login" style={{ width: 350 }}>
+      <Card title="Login" style={{ width: 350 }}>
         {loginError && <Alert message={loginError} type="error" showIcon style={{ marginBottom: 16 }} />}
         <Form
           name="login"
@@ -90,6 +110,9 @@ const LoginPage = () => {
               </Button>
               <Button type="default" onClick={showModal} block>
                 Request Registration
+              </Button>
+              <Button type="link" onClick={() => setIsAdmin(!isAdmin)} block>
+                {isAdmin ? 'Switch to Doctor Login' : 'Switch to Admin Login'}
               </Button>
             </Space>
           </Form.Item>

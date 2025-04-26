@@ -1,4 +1,4 @@
-// src/controllers/programController.ts
+//controllers/programController.ts
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 
@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 
 // CREATE: Create a new program
 export const createProgram = async (req: Request, res: Response) => {
-  const { name, clientIds } = req.body; // Assuming name is the field in your schema
+  const { name, clientIds } = req.body; 
   try {
     const program = await prisma.program.create({
       data: {
-        name, // Use name instead of title
+        name, 
         clients: clientIds ? { connect: clientIds.map((id: number) => ({ id })) } : undefined,
       },
     });
@@ -38,7 +38,7 @@ export const getProgramById = async (req: Request, res: Response) => {
     try {
       const program = await prisma.program.findUnique({
         where: { id: parseInt(id) },
-        include: { clients: true }, // Includes the associated clients
+        include: { clients: true }, 
       });
   
       if (!program) {
@@ -56,12 +56,12 @@ export const getProgramById = async (req: Request, res: Response) => {
 // UPDATE: Edit a program
 export const editProgram = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, clientIds } = req.body; // Update using the correct field name 'name'
+  const { name, clientIds } = req.body; 
   try {
     const program = await prisma.program.update({
       where: { id: parseInt(id) },
       data: {
-        name, // Use name here as well
+        name, 
         clients: clientIds ? { connect: clientIds.map((id: number) => ({ id })) } : undefined,
       },
     });

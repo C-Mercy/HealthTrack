@@ -1,4 +1,4 @@
-// src/routes/clientRoutes.ts
+//routes/clientRoutes.ts
 import express from 'express';
 import { registerClient ,editClient,deleteClient,getClientById,getClients} from '../controllers/clientController';
 import { authenticateDoctor } from '../middleware/authMiddleware';

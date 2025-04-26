@@ -48,7 +48,7 @@ const Header = () => {
   };
 
   if (location.pathname === '/login') {
-    return null; // Do not show header on login page
+    return null; 
   }
 
   const menu = (
