@@ -1,4 +1,3 @@
-// src/controllers/doctorController.ts
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -42,7 +41,6 @@ export const createDoctor = async (req: Request, res: Response) => {
   }
 };
 
-
 export const loginDoctor = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -64,7 +62,7 @@ export const loginDoctor = async (req: Request, res: Response) => {
       return;
     }
 
-    const token = jwt.sign({ id: doctor.id, email: doctor.email }, process.env.JWT_SECRET || 'secret', {
+    const token = jwt.sign({ doctorId: doctor.id, email: doctor.email }, process.env.JWT_SECRET || 'secret', {
       expiresIn: '1d',
     });
 
@@ -83,5 +81,26 @@ export const loginDoctor = async (req: Request, res: Response) => {
   }
 };
 
-
-
+export const getDoctorProfile = async (req: Request, res: Response) => {
+  const doctorId = (req as any).doctorId;
+  if (!doctorId) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  try {
+    const doctor = await prisma.doctor.findUnique({
+      where: { id: doctorId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+    return res.json(doctor);
+  } catch (error) {
+    console.error('Error fetching doctor profile:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
