@@ -17,7 +17,7 @@ const ProgramsPage = () => {
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
 
-  const [searchText, setSearchText] = useState(''); // State for search input
+  const [searchText, setSearchText] = useState(''); 
   const [editForm] = Form.useForm();
   const [addForm] = Form.useForm();
 
@@ -69,7 +69,7 @@ const ProgramsPage = () => {
     }
   };
 
-  // Filtered data based on search input
+  
   const filteredPrograms = programs
     ? programs.filter((program) =>
         program.name.toLowerCase().includes(searchText.toLowerCase())
@@ -142,7 +142,7 @@ const ProgramsPage = () => {
         Add Program
       </Button>
       <Table
-        dataSource={filteredPrograms} // Use filtered data
+        dataSource={filteredPrograms} 
         columns={columns}
         rowKey="id"
         pagination={{ pageSize: 10 }}

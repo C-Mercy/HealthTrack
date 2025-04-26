@@ -16,7 +16,7 @@ const ClientsPage = () => {
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
-  const [searchText, setSearchText] = useState(''); // State for search input
+  const [searchText, setSearchText] = useState(''); 
 
   const [editForm] = Form.useForm();
   const [addForm] = Form.useForm();
@@ -69,7 +69,7 @@ const ClientsPage = () => {
     }
   };
 
-  // Filter clients based on search text
+ 
   const filteredClients = clients
     ? clients.filter((client) =>
         client.name.toLowerCase().includes(searchText.toLowerCase())
@@ -151,7 +151,7 @@ const ClientsPage = () => {
       </Button>
 
       <Table
-        dataSource={filteredClients} // Filtered data source
+        dataSource={filteredClients} 
         columns={columns}
         rowKey="id"
         pagination={{ pageSize: 10 }}
