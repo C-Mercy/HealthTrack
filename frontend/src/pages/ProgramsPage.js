@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Button, Popconfirm, Space, Modal, Form, Input, message, Select } from 'antd';
-import { useGetProgramsQuery, useDeleteProgramMutation, useEditProgramMutation, useCreateProgramMutation  } from '../features/slices/programApi';
+import { useGetProgramsQuery, useDeleteProgramMutation, useEditProgramMutation, useCreateProgramMutation } from '../features/slices/programApi';
 import { useGetClientsQuery } from '../features/slices/clientApi';
-
 
 const { Option } = Select;
 
@@ -18,6 +17,7 @@ const ProgramsPage = () => {
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
 
+  const [searchText, setSearchText] = useState(''); // State for search input
   const [editForm] = Form.useForm();
   const [addForm] = Form.useForm();
 
@@ -30,7 +30,7 @@ const ProgramsPage = () => {
     setSelectedProgram(program);
     editForm.setFieldsValue({
       ...program,
-      clientIds: program.clients ? program.clients.map(c => c.id) : [],
+      clientIds: program.clients ? program.clients.map((c) => c.id) : [],
     });
     setEditModalVisible(true);
   };
@@ -69,6 +69,13 @@ const ProgramsPage = () => {
     }
   };
 
+  // Filtered data based on search input
+  const filteredPrograms = programs
+    ? programs.filter((program) =>
+        program.name.toLowerCase().includes(searchText.toLowerCase())
+      )
+    : [];
+
   const columns = [
     {
       title: 'ID',
@@ -81,22 +88,24 @@ const ProgramsPage = () => {
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
-      filterSearch: true,
-      onFilter: (value, record) => record.name.toLowerCase().includes(value.toLowerCase()),
     },
     {
       title: 'Clients',
       dataIndex: 'clients',
       key: 'clients',
-      render: (clients) => clients.map(c => c.name).join(', '),
+      render: (clients) => clients.map((c) => c.name).join(', '),
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" onClick={() => showViewModal(record)}>View</Button>
-          <Button type="default" onClick={() => showEditModal(record)}>Edit</Button>
+          <Button type="primary" onClick={() => showViewModal(record)}>
+            View
+          </Button>
+          <Button type="default" onClick={() => showEditModal(record)}>
+            Edit
+          </Button>
           <Popconfirm
             title="Are you sure to delete this program?"
             onConfirm={() => handleDelete(record.id)}
@@ -116,16 +125,30 @@ const ProgramsPage = () => {
   return (
     <div style={{ padding: 24 }}>
       <h2>Programs</h2>
-      <Button type="primary" style={{ marginBottom: 16 }} onClick={showAddModal}>
+
+      {/* Search Input */}
+      <Input.Search
+        placeholder="Search programs"
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{ marginBottom: 16 }}
+        allowClear
+      />
+
+      <Button
+        type="primary"
+        style={{ marginBottom: 16 }}
+        onClick={showAddModal}
+      >
         Add Program
       </Button>
       <Table
-        dataSource={programs}
+        dataSource={filteredPrograms} // Use filtered data
         columns={columns}
         rowKey="id"
         pagination={{ pageSize: 10 }}
       />
 
+      {/* View Program Modal */}
       <Modal
         title="View Program"
         visible={isViewModalVisible}
@@ -134,13 +157,21 @@ const ProgramsPage = () => {
       >
         {selectedProgram && (
           <div>
-            <p><strong>ID:</strong> {selectedProgram.id}</p>
-            <p><strong>Name:</strong> {selectedProgram.name}</p>
-            <p><strong>Clients:</strong> {selectedProgram.clients.map(c => c.name).join(', ')}</p>
+            <p>
+              <strong>ID:</strong> {selectedProgram.id}
+            </p>
+            <p>
+              <strong>Name:</strong> {selectedProgram.name}
+            </p>
+            <p>
+              <strong>Clients:</strong>{' '}
+              {selectedProgram.clients.map((c) => c.name).join(', ')}
+            </p>
           </div>
         )}
       </Modal>
 
+      {/* Edit Program Modal */}
       <Modal
         title="Edit Program"
         visible={isEditModalVisible}
@@ -156,18 +187,14 @@ const ProgramsPage = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="clientIds"
-            label="Clients"
-          >
-            <Select
-              mode="multiple"
-              placeholder="Select clients"
-              allowClear
-            >
-              {clients && clients.map(client => (
-                <Option key={client.id} value={client.id}>{client.name}</Option>
-              ))}
+          <Form.Item name="clientIds" label="Clients">
+            <Select mode="multiple" placeholder="Select clients" allowClear>
+              {clients &&
+                clients.map((client) => (
+                  <Option key={client.id} value={client.id}>
+                    {client.name}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
           <Form.Item>
@@ -178,6 +205,7 @@ const ProgramsPage = () => {
         </Form>
       </Modal>
 
+      {/* Add Program Modal */}
       <Modal
         title="Add Program"
         visible={isAddModalVisible}
@@ -193,18 +221,14 @@ const ProgramsPage = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item
-            name="clientIds"
-            label="Clients"
-          >
-            <Select
-              mode="multiple"
-              placeholder="Select clients"
-              allowClear
-            >
-              {clients && clients.map(client => (
-                <Option key={client.id} value={client.id}>{client.name}</Option>
-              ))}
+          <Form.Item name="clientIds" label="Clients">
+            <Select mode="multiple" placeholder="Select clients" allowClear>
+              {clients &&
+                clients.map((client) => (
+                  <Option key={client.id} value={client.id}>
+                    {client.name}
+                  </Option>
+                ))}
             </Select>
           </Form.Item>
           <Form.Item>
